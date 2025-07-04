@@ -32,7 +32,7 @@ export class AuthorsController {
     type: AuthorEntity,
   })
   @ApiResponse({ status: 401, description: 'Unauthorized.' })
-  @UseGuards(JwtAuthGuard)
+  // @UseGuards(JwtAuthGuard)
   @Post()
   create(@Body() createAuthorDto: CreateAuthorDto): Promise<AuthorEntity> {
     return this.authorsService.create(createAuthorDto);
@@ -52,7 +52,11 @@ export class AuthorsController {
 
   @ApiOperation({ summary: 'Get a single author by ID' })
   @ApiBody({ type: FilterAuthorsDto, description: 'Filter authors data' })
-  @ApiResponse({ status: 200, description: 'Author details.', type: AuthorEntity })
+  @ApiResponse({
+    status: 200,
+    description: 'Author details.',
+    type: AuthorEntity,
+  })
   @ApiResponse({ status: 404, description: 'Author not found.' })
   @Get(':id')
   findOne(@Param('id', ParseIntPipe) id: number): Promise<AuthorEntity> {

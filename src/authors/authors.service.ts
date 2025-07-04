@@ -4,9 +4,8 @@ import { UpdateAuthorDto } from './dto/update-author.dto';
 import { AuthorEntity } from './author.entity';
 import slugify from 'slugify';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
+import { Repository, In } from 'typeorm';
 import { FilterAuthorsDto } from './dto/filter-authors.dto';
-
 
 @Injectable()
 export class AuthorsService {
@@ -48,7 +47,8 @@ export class AuthorsService {
       });
     }
 
-    const sortField = sortBy === 'name' ? 'author.fullName' : `author.${sortBy}`;
+    const sortField =
+      sortBy === 'name' ? 'author.fullName' : `author.${sortBy}`;
     queryBuilder.orderBy(sortField, order.toUpperCase() as 'ASC' | 'DESC');
 
     queryBuilder.skip((page - 1) * limit);
@@ -65,6 +65,12 @@ export class AuthorsService {
     };
   }
 
+  async findAuthorsById(authorIDs: number[]): Promise<AuthorEntity[]> {
+    return this.authorRepository.find({
+      where: { id: In(authorIDs) },
+    });
+  }
+
   async findOne(id: number) {
     const author = await this.authorRepository.findOne({ where: { id } });
 
@@ -75,7 +81,10 @@ export class AuthorsService {
     return author;
   }
 
-  async update(id: number, updateAuthorDto: UpdateAuthorDto): Promise<AuthorEntity> {
+  async update(
+    id: number,
+    updateAuthorDto: UpdateAuthorDto,
+  ): Promise<AuthorEntity> {
     const author = await this.authorRepository.preload({
       id,
       ...updateAuthorDto,
